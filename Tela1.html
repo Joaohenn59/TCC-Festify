@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Party Time!</title>
+   <link rel="icon" type="image/png" href="PNG/Logo.png">
+  <link rel="stylesheet" href="Tela1.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+  <header>
+    <div class="logo">Party Time!</div>
+    <nav>
+      <a href="Home.html">Home</a>
+      <a href="#">Suporte</a>
+      <a href="#">Eventos</a>
+    </nav>
+    <a href="#" class="btn-carrinho">Carrinho</a>
+  </header>
+
+  <section class="hero">
+    <div class="overlay">
+      <h1>IT'S A PARTY TIME!</h1>
+    </div>
+  </section>
+
+  <section class="sobre">
+    <h2>SOBRE O SHOW</h2>
+    <p class="info">
+      <span>🕒: 01:20</span><br>
+      <span>📅 TIA IRIS</span>
+    </p>
+    <p class="descricao">
+      MAIS UM SHOW DE ZÉ NETO E CRISTIANO ESTÁ PARA ACONTECER<br>
+      NÃO PERCA, PARA TER SEU MEIO DE ENTRADA NO SHOW COMPRE<br>
+      SEU INGRESSO ABAIXO COM VALORES ACESSÍVEIS
+    </p>
+  </section>
+
+  <section class="ingressos">
+    <h2>BUY YOUR TICKET</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>Comum</h3>
+        <p class="preco">R$100</p>
+        <p>100% No Ritmo!<br>Música e Adrenalina!<br>Só o Essencial</p>
+        <button class="btn-laranja">Comprar</button>
+      </div>
+      <div class="card vip">
+        <h3>Vip</h3>
+        <p class="preco">R$150</p>
+        <p>Experiência Premium<br>Close do Artista<br>Poder + Festa</p>
+        <button>Comprar</button>
+      </div>
+      <div class="card">
+        <h3>Camarote</h3>
+        <p class="preco">R$300</p>
+        <p>Open Bar<br>Altura do Luxo<br>Você é Rei!</p>
+        <button class="btn-laranja">Comprar</button>
+      </div>
+    </div>
+  </section>
+  
+  <!-- MENU LATERAL DO CARRINHO -->
+<div id="carrinhoSidebar" class="sidebar">
+  <div class="sidebar-header">
+    <h2>Seu Carrinho</h2>
+    <button id="fecharCarrinho">X</button>
+  </div>
+  <div class="sidebar-content">
+    <p>Seu carrinho está vazio.</p>
+    <!-- Você pode colocar uma lista de itens aqui futuramente -->
+  </div>
+</div>
+
+<!-- FUNDO ESCURECIDO -->
+<div id="overlay" class="overlay"></div>
+
+ <footer>
+  <div class="footer-coluna beneficios">
+    <ul>
+      <li>Line-Ups Exclusivos</li>
+      <li>Estrutura Imersiva</li>
+      <li>Ingressos Com Experiências</li>
+    </ul>
+  </div>
+
+  <div class="footer-coluna sobre-nos">
+    <p>
+      O Festify Nasceu Da Paixão Por Transformar Momentos Em Memórias Inesquecíveis. Somos Especialistas Em Criar Experiências Únicas, Desde Shows Explosivos Até Festas Temáticas Que Ficam Na História. Com Produção De Alto Nível, Line-Ups Incríveis E Atendimento Personalizado, Nosso Objetivo É Simples: Fazer Você Viver A Festa Dos Seus Sonhos.
+    </p>
+  </div>
+
+  <div class="footer-coluna contato">
+    <p>+55 (45)98765-4321</p>
+    <p><a href="mailto:Contato@Festify.Com.Br">Contato@Festify.Com.Br</a></p>
+  </div>
+</footer>
+  <script>
+  const carrinhoBtn = document.querySelector(".btn-carrinho");
+  const sidebar = document.getElementById("carrinhoSidebar");
+  const fecharBtn = document.getElementById("fecharCarrinho");
+  const overlay = document.getElementById("overlay");
+
+  carrinhoBtn.addEventListener("click", () => {
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+  });
+
+  fecharBtn.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+  });
+
+  overlay.addEventListener("click", () => {
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+  });
+</script>
+</body>
+</html>
