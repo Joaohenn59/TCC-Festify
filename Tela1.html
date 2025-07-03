@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Party Time!</title>
-   <link rel="icon" type="image/png" href="PNG/Logo.png">
+  <link rel="icon" type="image/png" href="PNG/Logo.png">
   <link rel="stylesheet" href="Tela1.css" />
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
 </head>
 <body>
   <header>
@@ -26,19 +25,6 @@
     </div>
   </section>
 
-  <section class="sobre">
-    <h2>SOBRE O SHOW</h2>
-    <p class="info">
-      <span>🕒: 01:20</span><br>
-      <span>📅 TIA IRIS</span>
-    </p>
-    <p class="descricao">
-      MAIS UM SHOW DE ZÉ NETO E CRISTIANO ESTÁ PARA ACONTECER<br>
-      NÃO PERCA, PARA TER SEU MEIO DE ENTRADA NO SHOW COMPRE<br>
-      SEU INGRESSO ABAIXO COM VALORES ACESSÍVEIS
-    </p>
-  </section>
-
   <section class="ingressos">
     <h2>BUY YOUR TICKET</h2>
     <div class="cards">
@@ -46,37 +32,35 @@
         <h3>Comum</h3>
         <p class="preco">R$100</p>
         <p>100% No Ritmo!<br>Música e Adrenalina!<br>Só o Essencial</p>
-        <button class="btn-laranja">Comprar</button>
+        <button class="btn-laranja comprar-btn" data-item="Ingresso Comum - R$100">Comprar</button>
       </div>
       <div class="card vip">
         <h3>Vip</h3>
         <p class="preco">R$150</p>
         <p>Experiência Premium<br>Close do Artista<br>Poder + Festa</p>
-        <button>Comprar</button>
+        <button class="comprar-btn" data-item="Ingresso VIP - R$150">Comprar</button>
       </div>
       <div class="card">
         <h3>Camarote</h3>
         <p class="preco">R$300</p>
         <p>Open Bar<br>Altura do Luxo<br>Você é Rei!</p>
-        <button class="btn-laranja">Comprar</button>
+        <button class="btn-laranja comprar-btn" data-item="Ingresso Camarote - R$300">Comprar</button>
       </div>
     </div>
   </section>
-  
-  <!-- MENU LATERAL DO CARRINHO -->
-<div id="carrinhoSidebar" class="sidebar">
-  <div class="sidebar-header">
-    <h2>Seu Carrinho</h2>
-    <button id="fecharCarrinho">X</button>
-  </div>
-  <div class="sidebar-content">
-    <p>Seu carrinho está vazio.</p>
-    <!-- Você pode colocar uma lista de itens aqui futuramente -->
-  </div>
-</div>
 
-<!-- FUNDO ESCURECIDO -->
-<div id="overlay" class="overlay"></div>
+  <div id="carrinhoSidebar" class="sidebar">
+    <div class="sidebar-header">
+      <h2>Seu Carrinho</h2>
+      <button id="fecharCarrinho">X</button>
+    </div>
+    <div class="sidebar-content" id="carrinhoItens">
+      <p>Seu carrinho está vazio.</p>
+    </div>
+    <button id="pagarBtn" class="btn-laranja" style="font-size: 1.3rem; padding: 1rem; width: 100%; margin-top: 20px;">Pagar</button>
+  </div>
+
+  <div id="overlay" class="overlay"></div>
 
  <footer>
   <div class="footer-coluna beneficios">
@@ -99,25 +83,79 @@
   </div>
 </footer>
   <script>
-  const carrinhoBtn = document.querySelector(".btn-carrinho");
-  const sidebar = document.getElementById("carrinhoSidebar");
-  const fecharBtn = document.getElementById("fecharCarrinho");
-  const overlay = document.getElementById("overlay");
+    const carrinhoBtn = document.querySelector(".btn-carrinho");
+    const sidebar = document.getElementById("carrinhoSidebar");
+    const fecharBtn = document.getElementById("fecharCarrinho");
+    const overlay = document.getElementById("overlay");
+    const comprarBtns = document.querySelectorAll(".comprar-btn");
+    const carrinhoItens = document.getElementById("carrinhoItens");
+    const pagarBtn = document.getElementById("pagarBtn");
 
-  carrinhoBtn.addEventListener("click", () => {
-    sidebar.classList.add("active");
-    overlay.classList.add("active");
-  });
+    carrinhoBtn.addEventListener("click", () => {
+      sidebar.classList.add("active");
+      overlay.classList.add("active");
+    });
 
-  fecharBtn.addEventListener("click", () => {
-    sidebar.classList.remove("active");
-    overlay.classList.remove("active");
-  });
+    fecharBtn.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+      overlay.classList.remove("active");
+    });
 
-  overlay.addEventListener("click", () => {
-    sidebar.classList.remove("active");
-    overlay.classList.remove("active");
-  });
-</script>
+    overlay.addEventListener("click", () => {
+      sidebar.classList.remove("active");
+      overlay.classList.remove("active");
+    });
+
+    comprarBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const item = btn.getAttribute("data-item");
+        if (carrinhoItens.textContent.includes('Seu carrinho está vazio.')) {
+          carrinhoItens.innerHTML = '';
+        }
+        const itemDiv = document.createElement("div");
+        itemDiv.style.display = "flex";
+        itemDiv.style.justifyContent = "space-between";
+        itemDiv.style.alignItems = "center";
+        itemDiv.style.marginBottom = "8px";
+
+        const p = document.createElement("p");
+        p.textContent = item;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "Remover";
+        removeBtn.style.background = "red";
+        removeBtn.style.color = "white";
+        removeBtn.style.border = "none";
+        removeBtn.style.padding = "5px 10px";
+        removeBtn.style.borderRadius = "5px";
+        removeBtn.style.cursor = "pointer";
+
+        removeBtn.addEventListener("click", () => {
+          itemDiv.remove();
+          if (carrinhoItens.children.length === 0) {
+            carrinhoItens.innerHTML = '<p>Seu carrinho está vazio.</p>';
+          }
+        });
+
+        itemDiv.appendChild(p);
+        itemDiv.appendChild(removeBtn);
+        carrinhoItens.appendChild(itemDiv);
+
+        sidebar.classList.add("active");
+        overlay.classList.add("active");
+      });
+    });
+
+    pagarBtn.addEventListener("click", () => {
+      if (carrinhoItens.children.length === 0 || carrinhoItens.textContent.includes('Seu carrinho está vazio.')) {
+        alert("Seu carrinho está vazio!");
+      } else {
+        alert("Pagamento realizado com sucesso! Obrigado pela compra.");
+        carrinhoItens.innerHTML = '<p>Seu carrinho está vazio.</p>';
+        sidebar.classList.remove("active");
+        overlay.classList.remove("active");
+      }
+    });
+  </script>
 </body>
 </html>
