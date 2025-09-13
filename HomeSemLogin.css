@@ -1,0 +1,275 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Orbitron', sans-serif;
+  background-color: #000;
+  color: #fff;
+}
+
+/* NAVBAR */
+.navbar {
+  background-color: #09041A;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #222;
+}
+
+.navbar .container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+/* LOGO ESQUERDA */
+.logo {
+  display: flex;
+  gap: 5px;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: white;
+}
+
+/* LINKS CENTRALIZADOS */
+.nav-links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #a382e2;
+}
+
+/* BOTÃO LOGIN DIREITA */
+.btn-login {
+  background-color: #a382e2;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+
+.btn-login:hover {
+  background-color: #805acb;
+}
+
+/* HERO */
+.hero {
+  background: url('PNG/ImagemTelaInicial.jpg') no-repeat center center/cover;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+.hero .overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 2rem;
+  border-radius: 10px;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+.hero h1 span {
+  background-color: #a382e2;
+  padding: 0 0.5rem;
+  border-radius: 4px;
+  color: white;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+}
+
+/* DESCRIÇÃO */
+.descricao {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+  color: #ccc;
+  text-align: center;
+}
+
+/* ETAPAS */
+.etapas {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 2rem 1rem;
+  background: #0e0e0e;
+}
+
+.etapa {
+  background-color: white;
+  color: #222;
+  padding: 1.5rem;
+  border-radius: 10px;
+  flex: 1;
+  min-width: 250px;
+  max-width: 300px;
+  text-align: center;
+}
+
+/* SHOWS */
+.shows {
+  padding: 2rem;
+  text-align: center;
+}
+
+.shows h2 {
+  font-size: 1.8rem;
+  color: #a382e2;
+  margin-bottom: 2rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  justify-items: center;
+  padding: 0 1rem;
+}
+
+.card {
+  background-color: #111;
+  border: 1px solid #a382e2;
+  padding: 1rem;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 260px;
+  text-align: center;
+}
+
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.card p {
+  margin-top: 0.5rem;
+  font-weight: bold;
+  color: white;
+}
+
+.card a {
+  display: block;
+  margin-top: 0.5rem;
+  text-decoration: none;
+  color: #a382e2;
+  font-weight: bold;
+}
+
+.mais-eventos {
+  margin-top: 2rem;
+}
+
+.mais-eventos a {
+  color: #a382e2;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* FEEDBACK */
+.feedback {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #000;
+  text-align: left;
+}
+
+.feedback img {
+  max-width: 400px;
+  width: 100%;
+  border-radius: 10px;
+}
+
+.feedback div {
+  max-width: 400px;
+}
+
+.feedback a {
+  display: inline-block;
+  margin-top: 1rem;
+  background-color: #a382e2;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.feedback p img {
+  vertical-align: middle;
+  margin-right: 8px;
+  width: 20px;
+}
+
+/* NEWSLETTER */
+.newsletter {
+  background-color: #4c4ba3;
+  color: #fff;
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.newsletter form {
+  max-width: 500px;
+  margin: auto;
+}
+
+.newsletter input[type="email"] {
+  width: 100%;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.newsletter label {
+  display: block;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.newsletter button {
+  background-color: #888;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
