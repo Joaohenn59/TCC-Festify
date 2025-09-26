@@ -1,3 +1,25 @@
+<?php
+$mensagem_sucesso = "";
+
+if(isset($_POST['submit'])) { 
+    include_once ('config.php'); 
+    
+    $nome = $_POST['nome']; 
+    $senha = $_POST['senha']; 
+    $email = $_POST['email']; 
+    $telefone = $_POST['telefone'];   
+    $data_nasc = $_POST['data_nascimento']; 
+    $cidade = $_POST['cidade']; 
+    $estado = $_POST['estado']; 
+    $endereco = $_POST['endereco']; 
+    
+    $result = mysqli_query($conexao, "INSERT INTO usuarios(nome,senha,email,telefone,sexo,data_nasc,cidade,estado,endereco) VALUES('$nome','$senha','$email','$telefone','$sexo','$data_nasc','$cidade','$estado','$endereco')");
+    
+    $mensagem_sucesso = $result ? "Cadastro realizado com sucesso!" : "Erro ao cadastrar. Tente novamente.";
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
