@@ -16,6 +16,7 @@ $usuario_nome = "";
 if ($result_user && mysqli_num_rows($result_user) > 0) {
     $row_user = mysqli_fetch_assoc($result_user);
     $usuario_nome = $row_user['CLI_NOME'];
+    $_SESSION['usuario_nome'] = $usuario_nome; // garante que sempre tem o nome
 }
 
 // ================= FILTROS =================
@@ -29,16 +30,16 @@ if (!empty($data)) {
     $where[] = "e.EVE_DATA BETWEEN '$data_inicio' AND '$data_fim'";
 }
 
+// condição WHERE
 $where_sql = count($where) > 0 ? " AND " . implode(" AND ", $where) : "";
 
 // ================= EVENTOS =================
-$data_limite = date('Y-m-d H:i:s', strtotime('-1 day'));
 $sql_eventos = "
     SELECT e.*, 
            MIN(i.ING_VALOR) AS preco_min
     FROM TB_EVENTO e
     LEFT JOIN TB_INGRESSO i ON e.EVE_ID = i.EVE_ID
-    WHERE e.EVE_DATA >= '$data_limite' $where_sql
+    WHERE 1=1 $where_sql
     GROUP BY e.EVE_ID
     ORDER BY e.EVE_ID DESC
 ";
@@ -176,14 +177,20 @@ $result_eventos = mysqli_query($conexao, $sql_eventos);
   <div class="user-area">
     <a href="carrinho.php" class="btn-carrinho">🛒 Carrinho</a>
     <div class="user-menu">
-      <span class="user-name" onclick="toggleMenu()">Olá, <?php echo htmlspecialchars($usuario_nome); ?> ▼</span>
+      <span class="user-name" onclick="toggleMenu()">
+        Olá, <?= htmlspecialchars($usuario_nome) ?> ▼
+      </span>
       <div class="dropdown" id="menuDropdown">
         <a href="meus_ingressos.php">Meus Ingressos</a>
-        <form action="logout.php" method="POST"><button type="submit">Sair</button></form>
+        <a href="meus_eventos.php">Meus Eventos</a>
+        <form action="logout.php" method="POST">
+          <button type="submit">Sair</button>
+        </form>
       </div>
     </div>
   </div>
 </header>
+
 
 <div class="container">
   <h2>Eventos Disponíveis</h2>

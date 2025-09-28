@@ -73,22 +73,28 @@ $result = mysqli_query($conexao, $sql);
 </head>
 <body>
 <header>
-    <a href="Home.php" class="logo">Festify</a>
-    <nav>
-        <a href="Home.php">Home</a>
-        <a href="criar_evento.php">Criar Evento</a>
-    </nav>
-    <div class="user-area">
-        <a href="carrinho.php" class="btn-carrinho">🛒 Carrinho</a>
-        <div class="user-menu">
-            <span class="user-name" onclick="toggleMenu()">Olá, <?php echo htmlspecialchars($usuario_nome); ?> ▼</span>
-            <div class="dropdown" id="menuDropdown">
-                <a href="meus_ingressos.php">Meus Ingressos</a>
-                <form action="logout.php" method="POST"><button type="submit">Sair</button></form>
-            </div>
-        </div>
+  <a href="Home.php" class="logo">Festify</a>
+  <nav>
+    <a href="Home.php">Home</a>
+    <a href="criar_evento.php">Criar Evento</a>
+  </nav>
+  <div class="user-area">
+    <a href="carrinho.php" class="btn-carrinho">🛒 Carrinho</a>
+    <div class="user-menu">
+      <span class="user-name" onclick="toggleMenu()">
+        Olá, <?php echo $_SESSION['usuario_nome'] ?? ''; ?> ▼
+      </span>
+      <div class="dropdown" id="menuDropdown">
+        <a href="meus_ingressos.php">Meus Ingressos</a>
+        <a href="meus_eventos.php">Meus Eventos</a> <!-- 🔹 novo -->
+        <form action="logout.php" method="POST">
+          <button type="submit">Sair</button>
+        </form>
+      </div>
     </div>
+  </div>
 </header>
+
 
 <div class="container">
     <h2>Meus Ingressos</h2>

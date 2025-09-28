@@ -8,76 +8,76 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 $usuario_id = $_SESSION['usuario_id'];
+$valor_total = $_POST['valor_total'] ?? 0;
+$forma = $_POST['forma'] ?? '';
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $valor_total = floatval($_POST['valor_total'] ?? 0);
-    $forma = $_POST['forma'] ?? 'Cartão';
-
-    if ($valor_total <= 0) {
-        echo "<script>alert('Valor inválido!'); window.location='carrinho.php';</script>";
-        exit;
-    }
-
-    // 🔹 Ajustar forma de pagamento para bater com o ENUM do banco
-    if ($forma === "credito" || $forma === "debito") {
-        $forma_pagamento = "Cartão";
-    } elseif ($forma === "pix") {
-        $forma_pagamento = "PIX";
-    } else {
-        $forma_pagamento = "Cartão"; // fallback
-    }
-
-    // 🔹 Registrar o pagamento
-    $sql_pag = "INSERT INTO TB_PAGAMENTO 
-                (CLI_ID, PAG_VALOR, PAG_FORMA_PAGAMENTO, PAG_STATUS, PAG_DATA_PAGAMENTO) 
-                VALUES 
-                ('$usuario_id', '$valor_total', '$forma_pagamento', 'APROVADO', NOW())";
-
-    if (!mysqli_query($conexao, $sql_pag)) {
-        die("Erro ao registrar pagamento: " . mysqli_error($conexao));
-    }
-    $pagamento_id = mysqli_insert_id($conexao);
-
-    // 🔹 Buscar itens do carrinho
-    $sql_carrinho = "SELECT c.*, i.ING_ID, i.ING_TIPO, i.ING_VALOR, e.EVE_ID
-                     FROM TB_CARRINHO c
-                     JOIN TB_INGRESSO i ON c.ING_ID = i.ING_ID
-                     JOIN TB_EVENTO e ON i.EVE_ID = e.EVE_ID
-                     WHERE c.CLI_ID = '$usuario_id'";
-    $result_carrinho = mysqli_query($conexao, $sql_carrinho);
-
-    if ($result_carrinho && mysqli_num_rows($result_carrinho) > 0) {
-        while ($item = mysqli_fetch_assoc($result_carrinho)) {
-            $ingresso_id  = $item['ING_ID'];
-            $quantidade   = $item['CAR_QUANTIDADE'];
-            $valor        = $item['CAR_VALOR'];
-            $tipo         = $item['ING_TIPO'];
-            $meiaInteira  = $item['CAR_MEIA_INTEIRA'];
-            $evento_id    = $item['EVE_ID'];
-
-            // 🔹 Registrar a venda
-            $sql_venda = "INSERT INTO TB_VENDA_INGRESSO 
-                          (CLI_ID, ING_ID, VEI_QUANTIDADE, VEI_VALOR, VEI_TIPO, VEI_MEIA_INTEIRA, VEI_DATA_VENDA) 
-                          VALUES 
-                          ('$usuario_id', '$ingresso_id', '$quantidade', '$valor', '$tipo', '$meiaInteira', NOW())";
-            mysqli_query($conexao, $sql_venda);
-
-            // 🔹 Atualizar estoque
-            $sql_update = "UPDATE TB_INGRESSO 
-                           SET ING_QUANTIDADE_RESTANTE = ING_QUANTIDADE_RESTANTE - $quantidade
-                           WHERE ING_ID = '$ingresso_id'";
-            mysqli_query($conexao, $sql_update);
-        }
-    }
-
-    // 🔹 Limpar carrinho
-    $sql_limpar = "DELETE FROM TB_CARRINHO WHERE CLI_ID = '$usuario_id'";
-    mysqli_query($conexao, $sql_limpar);
-
-    echo "<script>
-            alert('Pagamento confirmado com sucesso! Seus ingressos estão disponíveis.');
-            window.location='meus_ingressos.php';
-          </script>";
+if ($valor_total <= 0) {
+    echo "Carrinho vazio ou valor inválido!";
     exit;
+}
+
+// === Salvar pagamento ===
+$sql_pag = "INSERT INTO TB_PAGAMENTO (CLI_ID, PAG_FORMA_PAGAMENTO, PAG_VALOR)
+            VALUES (?, ?, ?)";
+$stmt_pag = $conexao->prepare($sql_pag);
+$stmt_pag->bind_param("isd", $usuario_id, $forma, $valor_total);
+
+if ($stmt_pag->execute()) {
+    $pagamento_id = $conexao->insert_id;
+
+    // Pega os itens do carrinho
+    $sql_carrinho = "SELECT * FROM TB_CARRINHO WHERE CLI_ID = ?";
+    $stmt_car = $conexao->prepare($sql_carrinho);
+    $stmt_car->bind_param("i", $usuario_id);
+    $stmt_car->execute();
+    $res_carrinho = $stmt_car->get_result();
+
+    if ($res_carrinho->num_rows > 0) {
+        // Preparar venda
+        $sql_venda = "INSERT INTO TB_VENDA_INGRESSO 
+            (CLI_ID, ING_ID, VEI_QUANTIDADE, VEI_MEIA_INTEIRA, VEI_VALOR, VEI_TIPO, VEI_DATA_VENDA)
+            VALUES (?, ?, ?, ?, ?, ?, NOW())";
+        $stmt_venda = $conexao->prepare($sql_venda);
+
+        // Preparar update estoque
+        $sql_update = "UPDATE TB_INGRESSO SET ING_QUANTIDADE = ING_QUANTIDADE - ? WHERE ING_ID = ?";
+        $stmt_upd = $conexao->prepare($sql_update);
+
+        while ($item = $res_carrinho->fetch_assoc()) {
+            $ingresso_id  = (int) $item['ING_ID'];
+            $quantidade   = (int) $item['CAR_QUANTIDADE'];
+            $meia_inteira = $item['CAR_MEIA_INTEIRA']; // meia ou inteira
+            $valor        = (float) $item['CAR_VALOR'];
+            $tipo         = $meia_inteira;
+
+            // Registrar venda
+            $stmt_venda->bind_param(
+                "iiisds",
+                $usuario_id,
+                $ingresso_id,
+                $quantidade,
+                $meia_inteira,
+                $valor,
+                $tipo
+            );
+            $stmt_venda->execute();
+
+            // Atualizar estoque
+            $stmt_upd->bind_param("ii", $quantidade, $ingresso_id);
+            $stmt_upd->execute();
+        }
+
+        // Limpa carrinho
+        $sql_clear = "DELETE FROM TB_CARRINHO WHERE CLI_ID = ?";
+        $stmt_clear = $conexao->prepare($sql_clear);
+        $stmt_clear->bind_param("i", $usuario_id);
+        $stmt_clear->execute();
+
+        echo "<script>alert('Pagamento realizado com sucesso!'); window.location='meus_ingressos.php';</script>";
+    } else {
+        echo "Carrinho vazio!";
+    }
+} else {
+    echo "Erro ao processar pagamento: " . $conexao->error;
 }
 ?>
