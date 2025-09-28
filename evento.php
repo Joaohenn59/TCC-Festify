@@ -25,7 +25,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 $evento_id = intval($_GET['id']);
 
-// Processa adicionar ingresso ao carrinho (permanece na mesma tela)
+// ==================== PROCESSAR ADIÇÃO AO CARRINHO ====================
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add_carrinho'])) {
     $ingresso_id  = intval($_POST['ingresso_id']);
     $meia_inteira = $_POST['meia_inteira'] === 'meia' ? 'meia' : 'inteira';
@@ -33,17 +33,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add_carrinho'])) {
     if ($quantidade < 1) $quantidade = 1;
 
     // Busca valor do ingresso
-    $sql_valor = "SELECT ING_VALOR FROM TB_INGRESSO WHERE ING_ID = '$ingresso_id' LIMIT 1";
+    $sql_valor = "SELECT ING_VALOR, ING_QUANTIDADE_RESTANTE FROM TB_INGRESSO WHERE ING_ID = '$ingresso_id' LIMIT 1";
     $res_valor = mysqli_query($conexao, $sql_valor);
     if ($res_valor && mysqli_num_rows($res_valor) > 0) {
         $row_valor   = mysqli_fetch_assoc($res_valor);
         $valor_unit  = floatval($row_valor['ING_VALOR']);
+        $estoque     = intval($row_valor['ING_QUANTIDADE_RESTANTE']);
+
+        if ($quantidade > $estoque) {
+            echo "<script>alert('Quantidade solicitada maior que o estoque disponível!'); window.location='evento.php?id=$evento_id';</script>";
+            exit;
+        }
+
         if ($meia_inteira === 'meia') {
             $valor_unit = $valor_unit / 2;
         }
         $valor_total = $valor_unit * $quantidade;
 
-        // Grava no carrinho (agora incluindo CAR_VALOR)
+        // Grava no carrinho (❌ sem mexer no estoque ainda!)
         $sql_add = "INSERT INTO TB_CARRINHO 
                     (CLI_ID, ING_ID, CAR_MEIA_INTEIRA, CAR_QUANTIDADE, CAR_VALOR, CAR_DATA_ADICIONADO)
                     VALUES 
@@ -61,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add_carrinho'])) {
     }
 }
 
-// Puxa dados do evento (sem criador)
+// ==================== DADOS DO EVENTO ====================
 $sql_evento = "SELECT * FROM TB_EVENTO WHERE EVE_ID = '$evento_id'";
 $result_evento = mysqli_query($conexao, $sql_evento);
 $evento = mysqli_fetch_assoc($result_evento);
@@ -106,12 +113,7 @@ $result_ingressos = mysqli_query($conexao, $sql_ingressos);
       flex-wrap:wrap;
     }
 
-    .logo {
-      font-size:22px;
-      font-weight:bold;
-      color:white;
-      text-decoration:none;
-    }
+    .logo { font-size:22px; font-weight:bold; color:white; text-decoration:none; }
 
     nav {
       position:absolute;
@@ -121,164 +123,56 @@ $result_ingressos = mysqli_query($conexao, $sql_ingressos);
       gap:20px;
     }
 
-    nav a {
-      color:white;
-      text-decoration:none;
-      font-weight:bold;
-    }
+    nav a { color:white; text-decoration:none; font-weight:bold; }
+    nav a:hover { color:#ffb800; }
 
-    nav a:hover {
-      color:#ffb800;
-    }
+    .user-area { display:flex; align-items:center; gap:15px; }
+    .btn-carrinho { padding:8px 14px; background:#8000c8; border-radius:6px; color:white; font-weight:bold; text-decoration:none; transition:.3s; }
+    .btn-carrinho:hover { background:#a44dff; }
 
-    .user-area {
-      display:flex;
-      align-items:center;
-      gap:15px;
-    }
-
-    .btn-carrinho {
-      padding:8px 14px;
-      background:#8000c8;
-      border-radius:6px;
-      color:white;
-      font-weight:bold;
-      text-decoration:none;
-      transition:.3s;
-    }
-
-    .btn-carrinho:hover {
-      background:#a44dff;
-    }
-
-    .user-menu {
-      position:relative;
-      display:inline-block;
-    }
-
-    .user-name {
-      font-weight:bold;
-      color:#a76dff;
-      cursor:pointer;
-    }
-
+    .user-menu { position:relative; display:inline-block; }
+    .user-name { font-weight:bold; color:#a76dff; cursor:pointer; }
     .dropdown {
-      display:none;
-      position:absolute;
-      right:0;
-      background:#1c1c1c;
-      border-radius:6px;
-      margin-top:8px;
-      padding:10px;
-      min-width:160px;
-      z-index:100;
+      display:none; position:absolute; right:0; background:#1c1c1c;
+      border-radius:6px; margin-top:8px; padding:10px; min-width:160px; z-index:100;
     }
-
     .dropdown a,.dropdown button {
-      display:block;
-      padding:8px;
-      color:white;
-      text-decoration:none;
-      background:none;
-      border:none;
-      text-align:left;
-      width:100%;
-      cursor:pointer;
+      display:block; padding:8px; color:white; text-decoration:none;
+      background:none; border:none; text-align:left; width:100%; cursor:pointer;
     }
-
-    .dropdown a:hover,.dropdown button:hover {
-      background:#2a2a2a;
-    }
+    .dropdown a:hover,.dropdown button:hover { background:#2a2a2a; }
 
     /* ===== Container ===== */
     .container {
-      max-width:900px;
-      margin:30px auto;
-      background:#1c1c1c;
-      padding:30px;
-      border-radius:12px;
+      max-width:900px; margin:30px auto; background:#1c1c1c;
+      padding:30px; border-radius:12px;
     }
 
-    h1 {
-      color:#ffcc00;
-      margin-bottom:15px;
-      text-align:center;
-    }
-
-    h2 {
-      margin-top:30px;
-      color:#ffcc00;
-    }
+    h1 { color:#ffcc00; margin-bottom:15px; text-align:center; }
+    h2 { margin-top:30px; color:#ffcc00; }
 
     .ingresso-card {
-      background:#2a2a2a;
-      padding:20px;
-      border-radius:8px;
-      margin-bottom:15px;
+      background:#2a2a2a; padding:20px; border-radius:8px; margin-bottom:15px;
     }
 
-    .ingresso-card h3 {
-      color:#b44dff;
-    }
+    .ingresso-card h3 { color:#b44dff; }
 
-    .btn {
-      background:#ffcc00;
-      border:none;
-      padding:10px 15px;
-      cursor:pointer;
-      border-radius:6px;
-      font-weight:bold;
-    }
+    .btn { background:#ffcc00; border:none; padding:10px 15px; cursor:pointer; border-radius:6px; font-weight:bold; }
+    .btn:hover { background:#ffdb4d; }
 
-    .btn:hover {
-      background:#ffdb4d;
-    }
+    footer { margin-top:30px; text-align:left; font-size:14px; color:#aaa; }
 
-    footer {
-      margin-top:30px;
-      text-align:center;
-      font-size:14px;
-      color:#aaa;
-    }
-
-    /* ===== Responsividade ===== */
     @media (max-width: 900px) {
-      .container {
-        width:95%;
-        padding:20px;
-      }
-
-      nav {
-        position:static;
-        transform:none;
-        justify-content:center;
-        flex-wrap:wrap;
-      }
-
-      header {
-        flex-direction:column;
-        gap:10px;
-      }
-
-      .user-area {
-        justify-content:center;
-        margin-top:10px;
-      }
+      .container { width:95%; padding:20px; }
+      nav { position:static; transform:none; justify-content:center; flex-wrap:wrap; }
+      header { flex-direction:column; gap:10px; }
+      .user-area { justify-content:center; margin-top:10px; }
     }
 
     @media (max-width: 600px) {
-      .ingresso-card {
-        padding:15px;
-      }
-
-      h1 {
-        font-size:20px;
-      }
-
-      .btn {
-        width:100%;
-        text-align:center;
-      }
+      .ingresso-card { padding:15px; }
+      h1 { font-size:20px; }
+      .btn { width:100%; text-align:center; }
     }
   </style>
 </head>
@@ -306,6 +200,7 @@ $result_ingressos = mysqli_query($conexao, $sql_ingressos);
   <p><strong>Cantor:</strong> <?php echo htmlspecialchars($evento['EVE_CANTOR']); ?></p>
   <p><strong>Local:</strong> <?php echo htmlspecialchars($evento['EVE_LOCAL']); ?></p>
   <p><strong>Data:</strong> <?php echo date('d/m/Y H:i', strtotime($evento['EVE_DATA'])); ?></p>
+  <p><strong>Gênero:</strong> <?php echo htmlspecialchars($evento['EVE_MUSICA']); ?></p>
   <p><strong>Tipo:</strong> <?php echo htmlspecialchars($evento['EVE_TIPO']); ?></p>
 
   <h2>Sobre o Evento</h2>
@@ -315,30 +210,32 @@ $result_ingressos = mysqli_query($conexao, $sql_ingressos);
   <?php
   if ($result_ingressos && mysqli_num_rows($result_ingressos) > 0) {
       while ($ing = mysqli_fetch_assoc($result_ingressos)) {
+          $estoque = intval($ing['ING_QUANTIDADE_RESTANTE']);
+          $btn_disabled = $estoque <= 0 ? "disabled" : "";
+          $msg = $estoque <= 0 ? "<p style='color:red'><strong>Esgotado</strong></p>" : "
+            <form method='POST' action=''>
+                <label>Meia ou Inteira: </label>
+                <select name='meia_inteira'>
+                    <option value='inteira'>Inteira</option>
+                    <option value='meia'>Meia</option>
+                </select>
+                <label> Quantidade: </label>
+                <input type='number' name='quantidade' value='1' min='1' max='{$estoque}'>
+                <input type='hidden' name='ingresso_id' value='{$ing['ING_ID']}'>
+                <button type='submit' name='add_carrinho' class='btn' {$btn_disabled}>Adicionar ao Carrinho</button>
+            </form>";
+          
           echo "<div class='ingresso-card'>
                   <h3>".htmlspecialchars($ing['ING_TIPO'])." - R$ ".number_format($ing['ING_VALOR'],2,',','.')."</h3>
                   <p><strong>Benefícios:</strong> ".htmlspecialchars($ing['ING_BENEFICIOS'])."</p>
-                  <form method='POST' action=''>
-                      <label>Meia ou Inteira: </label>
-                      <select name='meia_inteira'>
-                          <option value='inteira'>Inteira</option>
-                          <option value='meia'>Meia</option>
-                      </select>
-                      <label> Quantidade: </label>
-                      <input type='number' name='quantidade' value='1' min='1'>
-                      <input type='hidden' name='ingresso_id' value='{$ing['ING_ID']}'>
-                      <button type='submit' name='add_carrinho' class='btn'>Adicionar ao Carrinho</button>
-                  </form>
+                  <p><strong>Estoque disponível:</strong> {$estoque}</p>
+                  {$msg}
                 </div>";
       }
   } else {
       echo "<p>Nenhum ingresso disponível.</p>";
   }
   ?>
-
-  <footer>
-    Festify - Plataforma de Eventos
-  </footer>
 </div>
 
 <script>

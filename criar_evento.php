@@ -24,13 +24,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $local = $_POST['local'];
     $data = $_POST['data'];
     $hora = $_POST['hora'];
-    //$genero = $_POST['genero']; // removido do insert
+    $genero = $_POST['genero'];
     $tipo = $_POST['tipo'];
     $descricao = $_POST['descricao'];
 
-    // Ajustado: sem EVE_GENERO
-    $sql_evento = "INSERT INTO TB_EVENTO (EVE_NOME, EVE_CANTOR, EVE_LOCAL, EVE_DATA, EVE_TIPO, EVE_DESCRICAO, EVE_CRIADOR) 
-                   VALUES ('$nome','$cantor','$local','$data $hora','$tipo','$descricao','$usuario_id')";
+    $sql_evento = "INSERT INTO TB_EVENTO (EVE_NOME, EVE_CANTOR, EVE_LOCAL, EVE_DATA, EVE_MUSICA, EVE_TIPO, EVE_DESCRICAO) 
+                   VALUES ('$nome','$cantor','$local','$data $hora','$genero','$tipo','$descricao')";
 
     if (mysqli_query($conexao, $sql_evento)) {
         $evento_id = mysqli_insert_id($conexao);
@@ -38,10 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (!empty($_POST['ingresso_tipo'])) {
             foreach ($_POST['ingresso_tipo'] as $i => $tipo_ingresso) {
                 $valor = $_POST['ingresso_valor'][$i];
+                $quantidade = $_POST['ingresso_quantidade'][$i];
                 $beneficios = $_POST['ingresso_beneficios'][$i];
 
-                $sql_ingresso = "INSERT INTO TB_INGRESSO (ING_TIPO, ING_VALOR, ING_BENEFICIOS, EVE_ID) 
-                                 VALUES ('$tipo_ingresso','$valor','$beneficios','$evento_id')";
+                $sql_ingresso = "INSERT INTO TB_INGRESSO 
+                                 (ING_TIPO, ING_VALOR, ING_BENEFICIOS, ING_QUANTIDADE_TOTAL, ING_QUANTIDADE_RESTANTE, EVE_ID) 
+                                 VALUES 
+                                 ('$tipo_ingresso','$valor','$beneficios','$quantidade','$quantidade','$evento_id')";
                 mysqli_query($conexao, $sql_ingresso);
             }
         }
@@ -52,7 +54,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -164,9 +165,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <label>Hora</label>
     <input type="time" name="hora" required>
 
-    <!-- Campo de gênero continua no form, mas não vai para o BD -->
     <label>Gênero</label>
-    <input type="text" name="genero">
+    <input type="text" name="genero" required>
 
     <label>Tipo</label>
     <input type="text" name="tipo" required>
@@ -182,6 +182,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <label>Valor (R$)</label>
         <input type="number" step="0.01" name="ingresso_valor[]" required>
+
+        <label>Quantidade Total</label>
+        <input type="number" name="ingresso_quantidade[]" min="1" required>
 
         <label>Benefícios</label>
         <textarea name="ingresso_beneficios[]" rows="2"></textarea>
@@ -203,6 +206,8 @@ function adicionarIngresso() {
     <input type="text" name="ingresso_tipo[]" placeholder="Ex: VIP, Pista" required>
     <label>Valor (R$)</label>
     <input type="number" step="0.01" name="ingresso_valor[]" required>
+    <label>Quantidade Total</label>
+    <input type="number" name="ingresso_quantidade[]" min="1" required>
     <label>Benefícios</label>
     <textarea name="ingresso_beneficios[]" rows="2"></textarea>
   `;

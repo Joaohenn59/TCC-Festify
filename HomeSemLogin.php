@@ -145,14 +145,14 @@ h2 {
     if ($result_eventos && mysqli_num_rows($result_eventos) > 0) {
         while ($evento = mysqli_fetch_assoc($result_eventos)) {
             $preco = $evento['preco_min'] ? "A partir de R$ " . number_format($evento['preco_min'], 2, ',', '.') : "Grátis";
-            echo "<div class='evento-card'>
+            echo "<a href='login.php' class='evento-card'>
                     <h3>{$evento['EVE_NOME']}</h3>
                     <p><strong>Tipo:</strong> {$evento['EVE_TIPO']}</p>
                     <p><strong>Música:</strong> {$evento['EVE_MUSICA']}</p>
                     <p><strong>Local:</strong> {$evento['EVE_LOCAL']}</p>
                     <p><strong>Data:</strong> " . date('d/m/Y H:i', strtotime($evento['EVE_DATA'])) . "</p>
                     <p><strong>Preço:</strong> $preco</p>
-                  </div>";
+                  </a>";
         }
     } else {
         echo "<p>Nenhum evento disponível.</p>";

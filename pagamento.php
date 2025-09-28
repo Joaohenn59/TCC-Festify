@@ -115,7 +115,6 @@ if ($valor_total <= 0) {
     textarea { resize: none; min-height: 78px; }
   </style>
 
-  <!-- Lib para gerar QR Code localmente -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
 </head>
 <body>
@@ -151,16 +150,12 @@ if ($valor_total <= 0) {
         <option value="pix">Pix</option>
       </select>
 
-      <!-- Área do QR do Pix -->
       <div id="qrcode">
         <h3>Escaneie o QR Code (Pix)</h3>
         <?php
-          // Payload Pix (exemplo; substitua pelo seu payload dinâmico conforme necessário)
           $pix_code = "00020126580014BR.GOV.BCB.PIX0136chavepix@festify.com5204000053039865802BR5925FESTIFY PAGAMENTOS LTDA6009SAO PAULO62070503***6304ABCD";
         ?>
-        <!-- QR gerado localmente -->
         <div id="pixQr" role="img" aria-label="QR Code Pix"></div>
-        <!-- Fallback por imagem (se a lib não carregar) -->
         <img id="pixQrImgFallback" alt="QR Code Pix (fallback)">
         <p><small>Código copia e cola:</small></p>
         <textarea readonly><?= htmlspecialchars($pix_code) ?></textarea>
@@ -171,41 +166,56 @@ if ($valor_total <= 0) {
   </div>
 
 <script>
-  // Util
-  function somenteNumeros(str){ return String(str).replace(/\D/g,''); }
+  function somenteDigitos(str){ return String(str).replace(/\D/g,''); }
 
-  // Detecta/mostra QR do Pix
+  const numeroEl = document.getElementById('numero');
+  const bandeiraImg = document.getElementById('bandeira');
+
+  numeroEl.addEventListener('input', function(){
+    let v = somenteDigitos(this.value).substring(0,16);
+    let partes = v.match(/.{1,4}/g);
+    this.value = partes ? partes.join(' ') : '';
+    detectarBandeira(v);
+  });
+
+  function detectarBandeira(numero){
+    let file = '';
+    if (/^4/.test(numero)) file = 'visa.png';
+    else if (/^5[1-5]/.test(numero)) file = 'mastercard.png';
+    else if (/^3[47]/.test(numero)) file = 'amex.png';
+    else if (/^(6011|65|64[4-9])/.test(numero)) file = 'discover.png';
+    else if (/^(50|63|64|65)/.test(numero)) file = 'elo.png';
+    if (file) {
+      bandeiraImg.src = 'bandeiras/' + file;
+      bandeiraImg.style.display = 'block';
+    } else {
+      bandeiraImg.style.display = 'none';
+    }
+  }
+
   const PIX_CODE = <?php echo json_encode($pix_code); ?>;
-
   function renderPixQr(){
     const qrDiv = document.getElementById('pixQr');
     const fbImg = document.getElementById('pixQrImgFallback');
-
-    // limpa anteriores
     qrDiv.innerHTML = '';
     fbImg.style.display = 'none';
     fbImg.removeAttribute('src');
-
     try {
       if (window.QRCode) {
         new QRCode(qrDiv, { text: PIX_CODE, width: 220, height: 220 });
       } else {
-        // fallback imagem
         const url = "https://chart.googleapis.com/chart?cht=qr&chs=220x220&chl=" + encodeURIComponent(PIX_CODE);
         fbImg.src = url;
         fbImg.style.display = 'inline-block';
       }
     } catch (e) {
-      // fallback imagem em caso de erro ao gerar localmente
       const url = "https://chart.googleapis.com/chart?cht=qr&chs=220x220&chl=" + encodeURIComponent(PIX_CODE);
       fbImg.src = url;
       fbImg.style.display = 'inline-block';
     }
-
-    // se fallback falhar (ex.: bloqueio de rede), avisa discretamente
     fbImg.onerror = function(){
       fbImg.style.display = 'none';
-      qrDiv.innerHTML = '<small style="color:#ffb3b3">Não foi possível carregar a imagem do QR. Use o código copia e cola abaixo.</small>';
+      qrDiv.innerHTML = '<small style="color:#ffb3b3">Não foi possível carregar o QR. Use o código abaixo.</small>';
     };
   }
 
@@ -223,43 +233,23 @@ if ($valor_total <= 0) {
     }
   }
 
-  // Luhn (se usar cartão)
-  function luhnValido(numero){
-    const s = String(numero).replace(/\D/g,'');
-    if (s.length < 12) return false;
-    let sum = 0, alt = false;
-    for (let i = s.length - 1; i >= 0; i--) {
-      let n = parseInt(s.charAt(i),10);
-      if (alt) { n *= 2; if (n > 9) n -= 9; }
-      sum += n; alt = !alt;
-    }
-    return (sum % 10) === 0;
-  }
-
   function validarFormulario(){
     const forma = document.getElementById('forma').value;
     if (forma === 'pix') return true;
 
-    const numero = document.getElementById('numero').value;
+    const numero = somenteDigitos(document.getElementById('numero').value);
     const mes = parseInt(document.getElementById('mes').value,10);
     const ano = parseInt(document.getElementById('ano').value,10);
-    const cvv = document.getElementById('cvv').value;
+    const cvv = document.getElementById('cvv').value.trim();
 
-    if (!luhnValido(numero)) { alert('Número de cartão inválido!'); return false; }
-    if (!mes || mes < 1 || mes > 12) { alert('Mês de validade inválido!'); return false; }
-
-    const hoje = new Date();
-    const anoAtual = parseInt(hoje.getFullYear().toString().slice(-2),10);
-    const mesAtual = hoje.getMonth() + 1;
-    if (!ano || ano < anoAtual || (ano === anoAtual && mes < mesAtual)) {
-      alert('Cartão expirado!'); return false;
-    }
-    if (!/^\d{3,4}$/.test(cvv)) { alert('CVV inválido!'); return false; }
+    if (!numero || numero.length < 12) { alert('Digite o número completo do cartão.'); return false; }
+    if (!mes || mes < 1 || mes > 12) { alert('Mês de validade inválido.'); return false; }
+    if (!ano) { alert('Ano de validade inválido.'); return false; }
+    if (!/^\d{3,4}$/.test(cvv)) { alert('Digite um CVV válido (3 ou 4 dígitos).'); return false; }
 
     return true;
   }
 
-  // Início
   mostrarQrCode();
 </script>
 </body>
