@@ -1,22 +1,15 @@
 <?php
-// Definições da conexão
-
-$dbHost = 'localhost';
-$dbUsername = 'root';
-$dbPassword = 'root';
-$dbName = 'festfy';
+// Dados da conexão com o MySQL
+$servidor = "localhost";   // geralmente "localhost" no XAMPP
+$usuario  = "root";        // usuário padrão do MySQL no XAMPP
+$senha    = "root";            // senha em branco no XAMPP (se você não alterou)
+$banco    = "festify";     // nome do banco que você criou no phpMyAdmin
 
 // Cria a conexão
-$conexao = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
+$conexao = mysqli_connect($servidor, $usuario, $senha, $banco);
 
-
-// Verifica a conexão
-if ($conexao->connect_error) {
-  die("Falha na conexão: " . $conexao->connect_error);
+// Verifica se deu erro
+if (!$conexao) {
+    die("Falha na conexão: " . mysqli_connect_error());
 }
-echo "Conectado com sucesso!";
-
-// Fecha a conexão (opcional, o PHP fecha automaticamente ao final do script)
-//$conexao->close();
-
 ?>
