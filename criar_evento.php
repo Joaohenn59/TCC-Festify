@@ -24,12 +24,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $local = $_POST['local'];
     $data = $_POST['data'];
     $hora = $_POST['hora'];
-    $genero = $_POST['genero'];
+    //$genero = $_POST['genero']; // removido do insert
     $tipo = $_POST['tipo'];
     $descricao = $_POST['descricao'];
 
-    $sql_evento = "INSERT INTO TB_EVENTO (EVE_NOME, EVE_CANTOR, EVE_LOCAL, EVE_DATA, EVE_GENERO, EVE_TIPO, EVE_DESCRICAO, EVE_CRIADOR) 
-                   VALUES ('$nome','$cantor','$local','$data $hora','$genero','$tipo','$descricao','$usuario_id')";
+    // Ajustado: sem EVE_GENERO
+    $sql_evento = "INSERT INTO TB_EVENTO (EVE_NOME, EVE_CANTOR, EVE_LOCAL, EVE_DATA, EVE_TIPO, EVE_DESCRICAO, EVE_CRIADOR) 
+                   VALUES ('$nome','$cantor','$local','$data $hora','$tipo','$descricao','$usuario_id')";
 
     if (mysqli_query($conexao, $sql_evento)) {
         $evento_id = mysqli_insert_id($conexao);
@@ -163,8 +164,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <label>Hora</label>
     <input type="time" name="hora" required>
 
+    <!-- Campo de gênero continua no form, mas não vai para o BD -->
     <label>Gênero</label>
-    <input type="text" name="genero" required>
+    <input type="text" name="genero">
 
     <label>Tipo</label>
     <input type="text" name="tipo" required>

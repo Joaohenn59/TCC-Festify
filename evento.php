@@ -61,11 +61,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add_carrinho'])) {
     }
 }
 
-// Puxa dados do evento
-$sql_evento = "SELECT e.*, c.CLI_NOME as criador_nome 
-               FROM TB_EVENTO e
-               JOIN TB_CLIENTE c ON e.CLI_ID = c.CLI_ID
-               WHERE e.EVE_ID = '$evento_id'";
+// Puxa dados do evento (sem criador)
+$sql_evento = "SELECT * FROM TB_EVENTO WHERE EVE_ID = '$evento_id'";
 $result_evento = mysqli_query($conexao, $sql_evento);
 $evento = mysqli_fetch_assoc($result_evento);
 
@@ -92,198 +89,197 @@ $result_ingressos = mysqli_query($conexao, $sql_ingressos);
   <link rel="icon" type="image/png" href="PNG/Logo.png">
   <style>
     body {
-  font-family: Arial, sans-serif;
-  background:#0b0010;
-  color:white;
-  margin:0;
-}
+      font-family: Arial, sans-serif;
+      background:#0b0010;
+      color:white;
+      margin:0;
+    }
 
-/* ===== Header ===== */
-header {
-  background:#0a0013;
-  padding:15px 40px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:relative;
-  flex-wrap:wrap;
-}
+    /* ===== Header ===== */
+    header {
+      background:#0a0013;
+      padding:15px 40px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      position:relative;
+      flex-wrap:wrap;
+    }
 
-.logo {
-  font-size:22px;
-  font-weight:bold;
-  color:white;
-  text-decoration:none;
-}
+    .logo {
+      font-size:22px;
+      font-weight:bold;
+      color:white;
+      text-decoration:none;
+    }
 
-nav {
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:20px;
-}
+    nav {
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      display:flex;
+      gap:20px;
+    }
 
-nav a {
-  color:white;
-  text-decoration:none;
-  font-weight:bold;
-}
+    nav a {
+      color:white;
+      text-decoration:none;
+      font-weight:bold;
+    }
 
-nav a:hover {
-  color:#ffb800;
-}
+    nav a:hover {
+      color:#ffb800;
+    }
 
-.user-area {
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
+    .user-area {
+      display:flex;
+      align-items:center;
+      gap:15px;
+    }
 
-.btn-carrinho {
-  padding:8px 14px;
-  background:#8000c8;
-  border-radius:6px;
-  color:white;
-  font-weight:bold;
-  text-decoration:none;
-  transition:.3s;
-}
+    .btn-carrinho {
+      padding:8px 14px;
+      background:#8000c8;
+      border-radius:6px;
+      color:white;
+      font-weight:bold;
+      text-decoration:none;
+      transition:.3s;
+    }
 
-.btn-carrinho:hover {
-  background:#a44dff;
-}
+    .btn-carrinho:hover {
+      background:#a44dff;
+    }
 
-.user-menu {
-  position:relative;
-  display:inline-block;
-}
+    .user-menu {
+      position:relative;
+      display:inline-block;
+    }
 
-.user-name {
-  font-weight:bold;
-  color:#a76dff;
-  cursor:pointer;
-}
+    .user-name {
+      font-weight:bold;
+      color:#a76dff;
+      cursor:pointer;
+    }
 
-.dropdown {
-  display:none;
-  position:absolute;
-  right:0;
-  background:#1c1c1c;
-  border-radius:6px;
-  margin-top:8px;
-  padding:10px;
-  min-width:160px;
-  z-index:100;
-}
+    .dropdown {
+      display:none;
+      position:absolute;
+      right:0;
+      background:#1c1c1c;
+      border-radius:6px;
+      margin-top:8px;
+      padding:10px;
+      min-width:160px;
+      z-index:100;
+    }
 
-.dropdown a,.dropdown button {
-  display:block;
-  padding:8px;
-  color:white;
-  text-decoration:none;
-  background:none;
-  border:none;
-  text-align:left;
-  width:100%;
-  cursor:pointer;
-}
+    .dropdown a,.dropdown button {
+      display:block;
+      padding:8px;
+      color:white;
+      text-decoration:none;
+      background:none;
+      border:none;
+      text-align:left;
+      width:100%;
+      cursor:pointer;
+    }
 
-.dropdown a:hover,.dropdown button:hover {
-  background:#2a2a2a;
-}
+    .dropdown a:hover,.dropdown button:hover {
+      background:#2a2a2a;
+    }
 
-/* ===== Container ===== */
-.container {
-  max-width:900px;
-  margin:30px auto;
-  background:#1c1c1c;
-  padding:30px;
-  border-radius:12px;
-}
+    /* ===== Container ===== */
+    .container {
+      max-width:900px;
+      margin:30px auto;
+      background:#1c1c1c;
+      padding:30px;
+      border-radius:12px;
+    }
 
-h1 {
-  color:#ffcc00;
-  margin-bottom:15px;
-  text-align:center;
-}
+    h1 {
+      color:#ffcc00;
+      margin-bottom:15px;
+      text-align:center;
+    }
 
-h2 {
-  margin-top:30px;
-  color:#ffcc00;
-}
+    h2 {
+      margin-top:30px;
+      color:#ffcc00;
+    }
 
-.ingresso-card {
-  background:#2a2a2a;
-  padding:20px;
-  border-radius:8px;
-  margin-bottom:15px;
-}
+    .ingresso-card {
+      background:#2a2a2a;
+      padding:20px;
+      border-radius:8px;
+      margin-bottom:15px;
+    }
 
-.ingresso-card h3 {
-  color:#b44dff;
-}
+    .ingresso-card h3 {
+      color:#b44dff;
+    }
 
-.btn {
-  background:#ffcc00;
-  border:none;
-  padding:10px 15px;
-  cursor:pointer;
-  border-radius:6px;
-  font-weight:bold;
-}
+    .btn {
+      background:#ffcc00;
+      border:none;
+      padding:10px 15px;
+      cursor:pointer;
+      border-radius:6px;
+      font-weight:bold;
+    }
 
-.btn:hover {
-  background:#ffdb4d;
-}
+    .btn:hover {
+      background:#ffdb4d;
+    }
 
-footer {
-  margin-top:30px;
-  text-align:left;
-  font-size:14px;
-  color:#aaa;
-}
+    footer {
+      margin-top:30px;
+      text-align:center;
+      font-size:14px;
+      color:#aaa;
+    }
 
-/* ===== Responsividade ===== */
-@media (max-width: 900px) {
-  .container {
-    width:95%;
-    padding:20px;
-  }
+    /* ===== Responsividade ===== */
+    @media (max-width: 900px) {
+      .container {
+        width:95%;
+        padding:20px;
+      }
 
-  nav {
-    position:static;
-    transform:none;
-    justify-content:center;
-    flex-wrap:wrap;
-  }
+      nav {
+        position:static;
+        transform:none;
+        justify-content:center;
+        flex-wrap:wrap;
+      }
 
-  header {
-    flex-direction:column;
-    gap:10px;
-  }
+      header {
+        flex-direction:column;
+        gap:10px;
+      }
 
-  .user-area {
-    justify-content:center;
-    margin-top:10px;
-  }
-}
+      .user-area {
+        justify-content:center;
+        margin-top:10px;
+      }
+    }
 
-@media (max-width: 600px) {
-  .ingresso-card {
-    padding:15px;
-  }
+    @media (max-width: 600px) {
+      .ingresso-card {
+        padding:15px;
+      }
 
-  h1 {
-    font-size:20px;
-  }
+      h1 {
+        font-size:20px;
+      }
 
-  .btn {
-    width:100%;
-    text-align:center;
-  }
-}
-
+      .btn {
+        width:100%;
+        text-align:center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -310,7 +306,6 @@ footer {
   <p><strong>Cantor:</strong> <?php echo htmlspecialchars($evento['EVE_CANTOR']); ?></p>
   <p><strong>Local:</strong> <?php echo htmlspecialchars($evento['EVE_LOCAL']); ?></p>
   <p><strong>Data:</strong> <?php echo date('d/m/Y H:i', strtotime($evento['EVE_DATA'])); ?></p>
-  <p><strong>Gênero:</strong> <?php echo htmlspecialchars($evento['EVE_MUSICA']); ?></p>
   <p><strong>Tipo:</strong> <?php echo htmlspecialchars($evento['EVE_TIPO']); ?></p>
 
   <h2>Sobre o Evento</h2>
@@ -342,7 +337,7 @@ footer {
   ?>
 
   <footer>
-    Criado por: <?php echo htmlspecialchars($evento['criador_nome']); ?>
+    Festify - Plataforma de Eventos
   </footer>
 </div>
 
