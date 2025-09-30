@@ -34,12 +34,14 @@ if (!empty($data)) {
 $where_sql = count($where) > 0 ? " AND " . implode(" AND ", $where) : "";
 
 // ================= EVENTOS =================
+$data_atual = date('Y-m-d H:i:s'); // pega a data e hora atuais
+
 $sql_eventos = "
     SELECT e.*, 
            MIN(i.ING_VALOR) AS preco_min
     FROM TB_EVENTO e
     LEFT JOIN TB_INGRESSO i ON e.EVE_ID = i.EVE_ID
-    WHERE 1=1 $where_sql
+    WHERE e.EVE_DATA >= '$data_atual' $where_sql
     GROUP BY e.EVE_ID
     ORDER BY e.EVE_ID DESC
 ";

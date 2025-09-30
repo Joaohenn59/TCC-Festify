@@ -2,6 +2,14 @@
 session_start();
 include("config.php");
 
+// Carregar PHPMailer corretamente
+require __DIR__ . '/PHPMailer/src/Exception.php';
+require __DIR__ . '/PHPMailer/src/PHPMailer.php';
+require __DIR__ . '/PHPMailer/src/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 $erros = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -35,21 +43,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // ✅ Verifica duplicidade no banco
     if (empty($erros)) {
-        // Email
         $checkEmail = "SELECT CLI_ID FROM TB_CLIENTE WHERE CLI_EMAIL = '$email'";
         $resEmail = mysqli_query($conexao, $checkEmail);
         if (mysqli_num_rows($resEmail) > 0) {
             $erros['email'] = "Este email já está cadastrado. Faça login ou use outro email.";
         }
 
-        // CPF
         $checkCpf = "SELECT CLI_ID FROM TB_CLIENTE WHERE CLI_CPF = '$cpf'";
         $resCpf = mysqli_query($conexao, $checkCpf);
         if (mysqli_num_rows($resCpf) > 0) {
             $erros['cpf'] = "Este CPF já está cadastrado.";
         }
 
-        // Telefone
         $checkTel = "SELECT CLI_ID FROM TB_CLIENTE WHERE CLI_FONE = '$telefone'";
         $resTel = mysqli_query($conexao, $checkTel);
         if (mysqli_num_rows($resTel) > 0) {
@@ -65,6 +70,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 VALUES ('$nome', '$email', '$hash', '$cpf', '$telefone')";
 
         if (mysqli_query($conexao, $sql)) {
+            // Enviar email de boas-vindas
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'tccfestify@gmail.com'; 
+                $mail->Password   = 'huad ruwb jfwy czwi'; // senha de app do Gmail
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port       = 587;
+
+                $mail->setFrom('tccfestify@gmail.com', 'Festify');
+                $mail->addAddress($email, $nome);
+
+                $mail->isHTML(true);
+                $mail->Subject = 'Bem-vindo ao Festify!';
+                $mail->Body    = "<h2>Olá, $nome!</h2><p>Seu cadastro no <b>Festify</b> foi realizado com sucesso. Agora você pode criar e participar de eventos incríveis! 🎶</p>";
+                $mail->AltBody = "Olá, $nome! Seu cadastro no Festify foi realizado com sucesso.";
+
+                $mail->send();
+            } catch (Exception $e) {
+                error_log("Erro ao enviar email: {$mail->ErrorInfo}");
+            }
+
             header("Location: login.php?cadastro=sucesso");
             exit;
         } else {
@@ -90,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   align-items:center;
   height:100vh;
   margin:0;
-  padding:20px; /* evita colar na borda do celular */
+  padding:20px;
 }
 
 .form-box {
@@ -163,34 +192,17 @@ a:hover {
   color:#fff;
 }
 
-/* 📱 Responsividade */
 @media (max-width: 480px) {
-  .form-box {
-    padding:20px;
-    max-width:95%;
-  }
-
-  h1 {
-    font-size:24px;
-  }
-
-  input, button {
-    font-size:14px;
-    padding:10px;
-  }
-
-  a {
-    font-size:13px;
-  }
+  .form-box { padding:20px; max-width:95%; }
+  h1 { font-size:24px; }
+  input, button { font-size:14px; padding:10px; }
+  a { font-size:13px; }
 }
 
 @media (max-width: 768px) {
-  .form-box {
-    max-width:90%;
-  }
+  .form-box { max-width:90%; }
 }
 </style>
-
 </head>
 <body>
   <div class="form-box">
@@ -222,63 +234,27 @@ a:hover {
     <a href="login.php">Já tem conta? Faça login</a>
   </div>
 
-  <script>
-    document.getElementById("formCadastro").addEventListener("submit", function(e) {
-      let cpf = document.getElementById("cpf").value.replace(/\D/g, '');
-      let tel = document.getElementById("telefone").value.replace(/\D/g, '');
-      let senha = document.getElementById("senha").value;
-      let confirmar = document.getElementById("confirmar").value;
-      let valid = true;
+<script>
+  // Máscara CPF
+  document.getElementById("cpf").addEventListener("input", function(e) {
+    let value = e.target.value.replace(/\D/g, "");
+    if (value.length > 11) value = value.slice(0, 11);
+    e.target.value = value
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  });
 
-      // Limpa mensagens
-      document.getElementById("erroCpf").textContent = "";
-      document.getElementById("erroTelefone").textContent = "";
-      document.getElementById("erroSenha").textContent = "";
-      document.getElementById("erroConfirmar").textContent = "";
-
-      if (cpf.length !== 11) {
-        document.getElementById("erroCpf").textContent = "CPF deve ter 11 números.";
-        valid = false;
-      }
-
-      if (tel.length < 10 || tel.length > 11) {
-        document.getElementById("erroTelefone").textContent = "Telefone deve ter 10 ou 11 números.";
-        valid = false;
-      }
-
-      if (senha.length < 6) {
-        document.getElementById("erroSenha").textContent = "Senha deve ter no mínimo 6 caracteres.";
-        valid = false;
-      }
-
-      if (senha !== confirmar) {
-        document.getElementById("erroConfirmar").textContent = "As senhas não coincidem.";
-        valid = false;
-      }
-
-      if (!valid) e.preventDefault();
-    });
-
-    // Máscara CPF
-    document.getElementById("cpf").addEventListener("input", function(e) {
-      let value = e.target.value.replace(/\D/g, "");
-      if (value.length > 11) value = value.slice(0, 11);
-      e.target.value = value
-        .replace(/(\d{3})(\d)/, "$1.$2")
-        .replace(/(\d{3})(\d)/, "$1.$2")
-        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-    });
-
-    // Máscara Telefone
-    document.getElementById("telefone").addEventListener("input", function(e) {
-      let value = e.target.value.replace(/\D/g, "");
-      if (value.length > 11) value = value.slice(0, 11);
-      if (value.length <= 10) {
-        e.target.value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
-      } else {
-        e.target.value = value.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
-      }
-    });
-  </script>
+  // Máscara Telefone
+  document.getElementById("telefone").addEventListener("input", function(e) {
+    let value = e.target.value.replace(/\D/g, "");
+    if (value.length > 11) value = value.slice(0, 11);
+    if (value.length <= 10) {
+      e.target.value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+    } else {
+      e.target.value = value.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+    }
+  });
+</script>
 </body>
 </html>
