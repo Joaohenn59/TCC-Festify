@@ -2,7 +2,7 @@
 session_start();
 include("config.php");
 
-// 🔹 Verifica se usuário está logado
+// Verifica se usuário está logado
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit;
@@ -10,7 +10,7 @@ if (!isset($_SESSION['usuario_id'])) {
 
 $usuario_id = $_SESSION['usuario_id'];
 
-// 🔹 Busca nome do usuário
+// Busca nome do usuário
 $sql_user = "SELECT CLI_NOME FROM TB_CLIENTE WHERE CLI_ID = '$usuario_id'";
 $result_user = mysqli_query($conexao, $sql_user);
 $usuario_nome = "";
@@ -19,7 +19,7 @@ if ($result_user && mysqli_num_rows($result_user) > 0) {
     $usuario_nome = $row_user['CLI_NOME'];
 }
 
-// 🔹 Busca ingressos comprados
+// Busca ingressos comprados
 $sql = "SELECT V.VEI_ID, V.VEI_QUANTIDADE, V.VEI_VALOR, V.VEI_TIPO, V.VEI_MEIA_INTEIRA, V.VEI_DATA_VENDA, 
                I.ING_TIPO, E.EVE_NOME, E.EVE_CANTOR, E.EVE_LOCAL, E.EVE_DATA
         FROM TB_VENDA_INGRESSO V
@@ -86,7 +86,7 @@ $result = mysqli_query($conexao, $sql);
       </span>
       <div class="dropdown" id="menuDropdown">
         <a href="meus_ingressos.php">Meus Ingressos</a>
-        <a href="meus_eventos.php">Meus Eventos</a> <!-- 🔹 novo -->
+        <a href="meus_eventos.php">Meus Eventos</a> <!-- novo -->
         <form action="logout.php" method="POST">
           <button type="submit">Sair</button>
         </form>
@@ -154,7 +154,7 @@ window.onclick = function(e) {
   }
 }
 
-// 🔹 Funções do Modal com Token + QRCode
+// Funções do Modal com Token + QRCode
 function abrirModal(titulo, cantor, local, data, tipo, meia, qtd, valor, compra) {
   document.getElementById('modalTitulo').innerText = titulo;
   document.getElementById('modalCantor').innerText = cantor;

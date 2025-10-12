@@ -1,8 +1,11 @@
 <?php
+// Inicia a sessão para gerenciar login e variáveis de usuário
 session_start();
+
+// Inclui o arquivo de conexão com o banco de dados
 include("config.php");
 
-// Carregar PHPMailer corretamente
+// Carrega as classes do PHPMailer para envio de emails
 require __DIR__ . '/PHPMailer/src/Exception.php';
 require __DIR__ . '/PHPMailer/src/PHPMailer.php';
 require __DIR__ . '/PHPMailer/src/SMTP.php';
@@ -10,17 +13,20 @@ require __DIR__ . '/PHPMailer/src/SMTP.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+// Array para armazenar mensagens de erro
 $erros = [];
 
+// Executa o código somente quando o formulário é enviado via POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Captura e trata os dados enviados pelo formulário
     $nome     = trim($_POST['nome']);
     $email    = trim($_POST['email']);
-    $telefone = preg_replace('/\D/', '', $_POST['telefone']);
-    $cpf      = preg_replace('/\D/', '', $_POST['cpf']);
+    $telefone = preg_replace('/\D/', '', $_POST['telefone']); // Remove tudo que não for número
+    $cpf      = preg_replace('/\D/', '', $_POST['cpf']);       // Mesma coisa para CPF
     $senha    = $_POST['senha'];
     $confirmar= $_POST['confirmar'];
 
-    // ✅ Validações
+    // ✅ Validações básicas dos campos
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $erros['email'] = "Email inválido!";
     }
@@ -41,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $erros['confirmar'] = "As senhas não coincidem.";
     }
 
-    // ✅ Verifica duplicidade no banco
+    // ✅ Verifica se já existe o mesmo email, CPF ou telefone no banco
     if (empty($erros)) {
         $checkEmail = "SELECT CLI_ID FROM TB_CLIENTE WHERE CLI_EMAIL = '$email'";
         $resEmail = mysqli_query($conexao, $checkEmail);
@@ -62,41 +68,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // ✅ Se não houver erros → cadastrar
+    // ✅ Se não houver erros, prossegue para o cadastro
     if (empty($erros)) {
+        // Criptografa a senha antes de salvar
         $hash = password_hash($senha, PASSWORD_DEFAULT);
 
+        // Insere os dados na tabela de clientes
         $sql = "INSERT INTO TB_CLIENTE (CLI_NOME, CLI_EMAIL, CLI_SENHA, CLI_CPF, CLI_FONE) 
                 VALUES ('$nome', '$email', '$hash', '$cpf', '$telefone')";
 
         if (mysqli_query($conexao, $sql)) {
-            // Enviar email de boas-vindas
+            // Configuração do envio de email de boas-vindas
             $mail = new PHPMailer(true);
             try {
-                $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = 'tccfestify@gmail.com'; 
-                $mail->Password   = 'huad ruwb jfwy czwi'; // senha de app do Gmail
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
+                $mail->isSMTP();  // Usa SMTP (mais confiável que mail())
+                $mail->Host       = 'smtp.gmail.com';  // Servidor SMTP do Gmail
+                $mail->SMTPAuth   = true; // autenticação
+                $mail->Username   = 'tccfestify@gmail.com'; // Conta de envio
+                $mail->Password   = 'huad ruwb jfwy czwi'; // senha de aplicativo do Gmail
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Criptografia TLS via STARTTLS
+                $mail->Port       = 587;  // Porta TLS do Gmail
 
+                // Remetente e destinatário
                 $mail->setFrom('tccfestify@gmail.com', 'Festify');
                 $mail->addAddress($email, $nome);
 
+                // Conteúdo do email em HTML
                 $mail->isHTML(true);
                 $mail->Subject = 'Bem-vindo ao Festify!';
                 $mail->Body    = "<h2>Olá, $nome!</h2><p>Seu cadastro no <b>Festify</b> foi realizado com sucesso. Agora você pode criar e participar de eventos incríveis! 🎶</p>";
                 $mail->AltBody = "Olá, $nome! Seu cadastro no Festify foi realizado com sucesso.";
 
-                $mail->send();
+                $mail->send(); // Envia o email
             } catch (Exception $e) {
+                // Caso falhe o envio, registra o erro no log
                 error_log("Erro ao enviar email: {$mail->ErrorInfo}");
             }
 
+            // Redireciona o usuário para o login após sucesso
             header("Location: login.php?cadastro=sucesso");
             exit;
         } else {
+            // Exibe erro geral caso o banco falhe
             $erros['geral'] = "Erro ao cadastrar: " . mysqli_error($conexao);
         }
     }
@@ -109,10 +122,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <title>Cadastro - Festify</title>
   <link rel="icon" type="image/png" href="PNG/Logo.png">
   <style>
-/* Estilos Gerais */
+
+/* ESTILOS VISUAIS GERAIS*/
+
   body {
   font-family: Arial, sans-serif;
-  background:#190016;
+  background:#190016; /* Fundo roxo escuro */
   color:white;
   display:flex;
   justify-content:center;
@@ -122,6 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   padding:20px;
 }
 
+/* Caixa do formulário */
 .form-box {
   background:#1c1c1c;
   padding:30px;
@@ -131,19 +147,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   box-shadow:0 0 15px rgba(0,0,0,0.5);
 }
 
+/* Título principal */
 h1 {
   text-align:center;
-  color:#ffcc00;
+  color:#ffcc00; /* Amarelo vibrante */
   margin-bottom:20px;
   font-size:28px;
 }
 
+/* Formulário organizado em coluna */
 form {
   display:flex;
   flex-direction:column;
   gap:15px;
 }
 
+/* Campos de texto */
 input {
   padding:12px;
   border:1px solid #555;
@@ -153,10 +172,12 @@ input {
   font-size:16px;
 }
 
+/* Texto do placeholder mais claro */
 input::placeholder {
   color:#aaa;
 }
 
+/* Botão de envio */
 button {
   padding:12px;
   background:#8000c8;
@@ -169,17 +190,20 @@ button {
   transition:background 0.3s ease, transform 0.2s ease;
 }
 
+/* Efeito hover no botão */
 button:hover {
   background:#a400ff;
   transform:scale(1.03);
 }
 
+/* Mensagens de erro */
 .erro {
   color:#ff4d4d;
   font-size:13px;
   margin-top:-10px;
 }
 
+/* Link para login */
 a {
   color:#ccc;
   font-size:14px;
@@ -192,6 +216,7 @@ a:hover {
   color:#fff;
 }
 
+/* Responsividade para celular */
 @media (max-width: 480px) {
   .form-box { padding:20px; max-width:95%; }
   h1 { font-size:24px; }
@@ -199,6 +224,7 @@ a:hover {
   a { font-size:13px; }
 }
 
+/* Responsividade para tablet */
 @media (max-width: 768px) {
   .form-box { max-width:90%; }
 }
@@ -207,6 +233,7 @@ a:hover {
 <body>
   <div class="form-box">
     <h1>Cadastro</h1>
+    <!-- Formulário principal -->
     <form id="formCadastro" action="Cadastro.php" method="POST" novalidate>
       <input type="text" name="nome" placeholder="Nome Completo" required>
       <div class="erro"><?php echo $erros['nome'] ?? ""; ?></div>
@@ -229,13 +256,15 @@ a:hover {
       <button type="submit">Cadastrar</button>
     </form>
 
+    <!-- Exibe mensagens de erro gerais -->
     <div class="erro" style="text-align:center;"><?php echo $erros['geral'] ?? ""; ?></div>
 
+    <!-- Link para a página de login -->
     <a href="login.php">Já tem conta? Faça login</a>
   </div>
 
 <script>
-  // Máscara CPF
+  // Aplica máscara no campo CPF (formato 000.000.000-00)
   document.getElementById("cpf").addEventListener("input", function(e) {
     let value = e.target.value.replace(/\D/g, "");
     if (value.length > 11) value = value.slice(0, 11);
@@ -245,7 +274,7 @@ a:hover {
       .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
   });
 
-  // Máscara Telefone
+  // Aplica máscara no telefone ((DDD) 99999-9999)
   document.getElementById("telefone").addEventListener("input", function(e) {
     let value = e.target.value.replace(/\D/g, "");
     if (value.length > 11) value = value.slice(0, 11);

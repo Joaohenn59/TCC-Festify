@@ -21,7 +21,7 @@ if (!$evento) {
     exit;
 }
 
-// ===================== ATUALIZAR EVENTO E INGRESSOS =====================
+// ATUALIZAR EVENTO E INGRESSOS 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['atualizar'])) {
     $nome = $_POST['nome'];
     $local = $_POST['local'];
@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['atualizar'])) {
     echo "<script>alert('Evento e ingressos atualizados com sucesso!'); window.location='meus_eventos.php';</script>";
 }
 
-// ===================== EXCLUIR EVENTO =====================
+// EXCLUIR EVENTO 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['excluir'])) {
     mysqli_query($conexao, "
         DELETE v FROM TB_VENDA_INGRESSO v
@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['excluir'])) {
     echo "<script>alert('Evento e ingressos excluídos com sucesso!'); window.location='meus_eventos.php';</script>";
 }
 
-// ===================== LISTAR INGRESSOS =====================
+// LISTAR INGRESSOS
 $sql_ingressos = "SELECT * FROM TB_INGRESSO WHERE EVE_ID='$evento_id'";
 $result_ingressos = mysqli_query($conexao, $sql_ingressos);
 

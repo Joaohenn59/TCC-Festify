@@ -2,18 +2,23 @@
 session_start();
 include("config.php");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") { // Verifica se o método de envio do formulário foi POST (quando o usuário envia os dados)
+  
+   // Captura os dados enviados pelo formulário
+   $email = $_POST['email'];
     $nova_senha = $_POST['nova_senha'];
     $confirmar_senha = $_POST['confirmar_senha'];
 
+    // Verifica se as senhas digitadas são diferentes
     if ($nova_senha !== $confirmar_senha) {
         echo "<script>alert('As senhas não coincidem!'); window.location='redefinir_senha.php';</script>";
         exit;
     }
 
+    // Gera um hash seguro da senha antes de salvar no banco (CRIPTOGRAFIA)
     $hash = password_hash($nova_senha, PASSWORD_DEFAULT);
 
+    // Atualiza a senha no banco para o usuário com o e-mail informado
     $sql = "UPDATE TB_CLIENTE SET CLI_SENHA = '$hash' WHERE CLI_EMAIL = '$email'";
     if (mysqli_query($conexao, $sql) && mysqli_affected_rows($conexao) > 0) {
         echo "<script>alert('Senha redefinida com sucesso!'); window.location='login.php';</script>";

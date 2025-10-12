@@ -22,7 +22,7 @@ $result_eventos = mysqli_query($conexao, $sql_eventos);
   <link rel="icon" type="image/png" href="PNG/Logo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Responsivo -->
   <style>
-   /* === ESTILO GERAL === */
+   /*  ESTILO GERAL  */
 body {
   font-family: Arial, sans-serif;
   background:#0b0010;
@@ -30,7 +30,7 @@ body {
   margin:0;
 }
 
-/* === HEADER === */
+/*  HEADER  */
 header {
   background:#0a0013;
   padding:15px 40px;
@@ -63,7 +63,7 @@ nav a:hover {
   color:#ffb800;
 }
 
-/* === CONTEÚDO PRINCIPAL === */
+/*  CONTEÚDO PRINCIPAL  */
 .container {
   padding:30px;
   text-align:center;
@@ -73,7 +73,7 @@ h2 {
   color:#ffcc00;
 }
 
-/* === CARDS DE EVENTOS === */
+/* CARDS DE EVENTOS */
 .eventos {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
@@ -108,7 +108,7 @@ h2 {
   padding-bottom:5px;
 }
 
-/* === RESPONSIVIDADE === */
+/* RESPONSIVIDADE */
 @media (max-width: 768px) {
   header {
     flex-direction:column;

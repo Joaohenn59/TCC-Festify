@@ -2,14 +2,19 @@
 session_start();
 include("config.php");
 
+// Se o usuário não estiver logado, redireciona para a página de login
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit;
 }
 
+// Armazena o ID do usuário logado na variável
 $usuario_id = $_SESSION['usuario_id'];
+
+// Recebe o valor total do carrinho 
 $valor_total = $_POST['valor_total'] ?? 0;
 
+// Verifica se o valor total é válido
 if ($valor_total <= 0) {
     echo "Carrinho vazio ou valor inválido!";
     exit;
@@ -91,11 +96,15 @@ if ($valor_total <= 0) {
       cursor: pointer;
       font-size: 15px;
     }
+    /* Efeito visual ao passar o mouse no botão */
     .btn:hover { opacity: 0.9; }
 
+   /* Área do QR Code */
     #qrcode { margin-top: 16px; display: none; text-align:center; }
     #pixQr { display:inline-block; }
     #pixQrImgFallback { display:none; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+
+    /* Área do código Pix "copia e cola" */
     textarea { resize: none; min-height: 78px; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>

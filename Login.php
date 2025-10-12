@@ -117,7 +117,7 @@ button:hover {
   background-color: #a400ff;
 }
 
-/* 🔹 Botões de links (cadastro/esqueci senha) */
+/* Botões de links (cadastro/esqueci senha) */
 .links {
   display: flex;
   justify-content: space-between;

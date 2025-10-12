@@ -19,7 +19,7 @@ if ($result_user && mysqli_num_rows($result_user) > 0) {
     $_SESSION['usuario_nome'] = $usuario_nome; // garante que sempre tem o nome
 }
 
-// ================= FILTROS =================
+// FILTROS 
 $where = [];
 $data = $_GET['data'] ?? '';
 
@@ -33,7 +33,7 @@ if (!empty($data)) {
 // condição WHERE
 $where_sql = count($where) > 0 ? " AND " . implode(" AND ", $where) : "";
 
-// ================= EVENTOS =================
+// EVENTOS 
 $data_atual = date('Y-m-d H:i:s'); // pega a data e hora atuais
 
 $sql_eventos = "
@@ -62,7 +62,7 @@ $result_eventos = mysqli_query($conexao, $sql_eventos);
       margin:0;
     }
 
-    /* ===== Header ===== */
+    /* Header */
     header {
       background:#0a0013;
       padding:15px 40px;
@@ -108,12 +108,12 @@ $result_eventos = mysqli_query($conexao, $sql_eventos);
     }
     .dropdown a:hover,.dropdown button:hover { background:#2a2a2a; }
 
-    /* ===== Conteúdo ===== */
+    /* Conteúdo */
     .container { padding:30px; max-width:1200px; margin:auto; }
 
     h2 { color:#ffcc00; }
 
-    /* ===== Filtros ===== */
+    /* Filtros */
     .filtros {
       background:#1c1c1c;
       padding:20px;
@@ -143,7 +143,7 @@ $result_eventos = mysqli_query($conexao, $sql_eventos);
     }
     .filtros button:hover { background:#ffdb4d; }
 
-    /* ===== Cards ===== */
+    /* Cards */
     .eventos {
       display:grid;
       grid-template-columns:repeat(auto-fill,minmax(260px,1fr));

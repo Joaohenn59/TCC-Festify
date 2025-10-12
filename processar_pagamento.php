@@ -16,7 +16,7 @@ if ($valor_total <= 0) {
     exit;
 }
 
-// === Salvar pagamento ===
+// Salvar pagamento 
 $sql_pag = "INSERT INTO TB_PAGAMENTO (CLI_ID, PAG_FORMA_PAGAMENTO, PAG_VALOR)
             VALUES (?, ?, ?)";
 $stmt_pag = $conexao->prepare($sql_pag);

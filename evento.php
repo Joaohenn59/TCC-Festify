@@ -25,7 +25,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 $evento_id = intval($_GET['id']);
 
-// ================== ADICIONAR AO CARRINHO ==================
+// ADICIONAR AO CARRINHO 
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add_carrinho'])) {
     $ingresso_id  = intval($_POST['ingresso_id']);
     $meia_inteira = $_POST['meia_inteira'] ?? 'inteira';
@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add_carrinho'])) {
     }
 }
 
-// ================== EVENTO ==================
+// EVENTO 
 $sql_evento = "SELECT * FROM TB_EVENTO WHERE EVE_ID = '$evento_id' LIMIT 1";
 $result_evento = mysqli_query($conexao, $sql_evento);
 $evento = mysqli_fetch_assoc($result_evento);
