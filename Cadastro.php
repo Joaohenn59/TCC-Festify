@@ -105,12 +105,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 error_log("Erro ao enviar email: {$mail->ErrorInfo}");
             }
 
-            // Redireciona o usuário para o login após sucesso
-            header("Location: login.php?cadastro=sucesso");
+            // ✅ Mostra mensagem e redireciona com JavaScript
+            echo "<script>
+                alert('🎉 Cadastro realizado com sucesso! Faça login para continuar.');
+                window.location.href = 'login.php';
+            </script>";
             exit;
         } else {
             // Exibe erro geral caso o banco falhe
-            $erros['geral'] = "Erro ao cadastrar: " . mysqli_error($conexao);
+            $erros['geral'] = 'Erro ao cadastrar: ' . mysqli_error($conexao);
         }
     }
 }
